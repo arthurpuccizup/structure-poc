@@ -9,50 +9,50 @@ import (
 )
 
 type Error interface {
-	Error() customError
-	SensitiveError() sensitiveError
-	AddMeta(key, value string) *customError
-	AddOperation(operation string) *customError
+	Error() sensitiveError
+	SensitiveError() customError
+	AddMeta(key, value string) *sensitiveError
+	AddOperation(operation string) *sensitiveError
 	Marshal() ([]byte, error)
 }
 
-type customError struct {
-	sensitiveError
+type sensitiveError struct {
+	customError
 	Detail     string   `json:"detail"`
 	Operations []string `json:"operations"`
 }
 
-type sensitiveError struct {
+type customError struct {
 	ID    uuid.UUID         `json:"id"`
 	Title string            `json:"title"`
 	Meta  map[string]string `json:"meta"`
 }
 
-func (e *customError) Error() customError {
+func (e *sensitiveError) Error() sensitiveError {
 	return *e
 }
 
-func (e *customError) SensitiveError() sensitiveError {
-	return e.sensitiveError
+func (e *sensitiveError) SensitiveError() customError {
+	return e.customError
 }
 
-func (e *customError) AddMeta(key, value string) *customError {
+func (e *sensitiveError) AddMeta(key, value string) *sensitiveError {
 	e.Meta[key] = value
 	return e
 }
 
-func (e *customError) AddOperation(operation string) *customError {
+func (e *sensitiveError) AddOperation(operation string) *sensitiveError {
 	e.Operations = append(e.Operations, operation)
 	return e
 }
 
-func (e *customError) Marshal() ([]byte, error) {
+func (e *sensitiveError) Marshal() ([]byte, error) {
 	return json.Marshal(&e)
 }
 
 func New(title, detail string) Error {
-	return &customError{
-		sensitiveError: sensitiveError{
+	return &sensitiveError{
+		customError: customError{
 			ID:    uuid.New(),
 			Title: title,
 			Meta: map[string]string{

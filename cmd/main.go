@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/ZupIT/charlescd/web/api"
 	"github.com/labstack/echo"
 	"log"
 
-	userHttp "github.com/ZupIT/charlescd/internal/user/delivery/http"
 	userRepository "github.com/ZupIT/charlescd/internal/user/repository"
 	userUsecase "github.com/ZupIT/charlescd/internal/user/usecase"
 )
@@ -25,11 +25,10 @@ func main() {
 	userRepo := userRepository.NewGormUserRepository(gormDB)
 	userUsec := userUsecase.NewUserUsecase(userRepo)
 
-
 	e := echo.New()
 	v1 := e.Group("/v1")
 	{
-		userHttp.NewUserHandler(v1, userUsec)
+		api.NewUserHandler(v1, userUsec)
 	}
 
 	log.Fatalln(e.Start(":8080"))

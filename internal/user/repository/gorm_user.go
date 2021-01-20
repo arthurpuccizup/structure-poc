@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"context"
-
 	"github.com/ZupIT/charlescd/internal/errors"
 	"github.com/ZupIT/charlescd/internal/models"
 	"github.com/ZupIT/charlescd/internal/user"
@@ -11,14 +9,14 @@ import (
 )
 
 type gormRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
-func NewGormUserRepository() user.Repository {
-	return gormRepository{}
+func NewGormUserRepository(db *gorm.DB) user.Repository {
+	return gormRepository{db: db}
 }
 
-func (r gormRepository) FindAll(ctx context.Context) ([]models.User, errors.Error) {
+func (r gormRepository) FindAll() ([]models.User, errors.Error) {
 	var users []models.User
 
 	if res := r.db.Find(&users); res.Error != nil {
@@ -28,15 +26,16 @@ func (r gormRepository) FindAll(ctx context.Context) ([]models.User, errors.Erro
 	return users, nil
 }
 
-func (r gormRepository) Save(ctx context.Context, user models.User) (models.User, errors.Error) {
-	if res := r.db.Save(user); res.Error != nil {
+func (r gormRepository) Save(user models.User) (models.User, errors.Error) {
+	user.ID = uuid.New()
+	if res := r.db.Save(&user); res.Error != nil {
 		return models.User{}, errors.New("Save user failed", res.Error.Error()).AddOperation("repository.Save.Save")
 	}
 
 	return user, nil
 }
 
-func (r gormRepository) GetByID(ctx context.Context, id uuid.UUID) (models.User, errors.Error) {
+func (r gormRepository) GetByID(id uuid.UUID) (models.User, errors.Error) {
 	var user models.User
 
 	if res := r.db.Model(models.User{}).Where("id = ?", id).First(&user); res.Error != nil {
@@ -46,7 +45,7 @@ func (r gormRepository) GetByID(ctx context.Context, id uuid.UUID) (models.User,
 	return user, nil
 }
 
-func (r gormRepository) Update(ctx context.Context, id uuid.UUID, user models.User) (models.User, errors.Error) {
+func (r gormRepository) Update(id uuid.UUID, user models.User) (models.User, errors.Error) {
 	if res := r.db.Model(models.User{}).Where("id = ?", id).Updates(&user); res.Error != nil {
 		return models.User{}, errors.New("Update user failed", res.Error.Error()).AddOperation("repository.Update.Updates")
 	}
@@ -54,7 +53,7 @@ func (r gormRepository) Update(ctx context.Context, id uuid.UUID, user models.Us
 	return user, nil
 }
 
-func (r gormRepository) Delete(ctx context.Context, id uuid.UUID) errors.Error {
+func (r gormRepository) Delete(id uuid.UUID) errors.Error {
 	if res := r.db.Delete(models.User{}, id); res.Error != nil {
 		return errors.New("Delete user failed", res.Error.Error()).AddOperation("repository.Delete.Delete")
 	}

@@ -9,17 +9,31 @@ import (
 )
 
 type Error interface {
+	Error() customError
+	SensitiveError() sensitiveError
 	AddMeta(key, value string) *customError
 	AddOperation(operation string) *customError
 	Marshal() ([]byte, error)
 }
 
 type customError struct {
-	ID         uuid.UUID         `json:"id"`
-	Title      string            `json:"title"`
-	Detail     string            `json:"detail"`
-	Meta       map[string]string `json:"meta"`
-	Operations []string          `json:"operations"`
+	sensitiveError
+	Detail     string   `json:"detail"`
+	Operations []string `json:"operations"`
+}
+
+type sensitiveError struct {
+	ID    uuid.UUID         `json:"id"`
+	Title string            `json:"title"`
+	Meta  map[string]string `json:"meta"`
+}
+
+func (e *customError) Error() customError {
+	return *e
+}
+
+func (e *customError) SensitiveError() sensitiveError {
+	return e.sensitiveError
 }
 
 func (e *customError) AddMeta(key, value string) *customError {
@@ -38,12 +52,14 @@ func (e *customError) Marshal() ([]byte, error) {
 
 func New(title, detail string) Error {
 	return &customError{
-		ID:     uuid.New(),
-		Title:  title,
-		Detail: detail,
-		Meta: map[string]string{
-			"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
+		sensitiveError: sensitiveError{
+			ID:    uuid.New(),
+			Title: title,
+			Meta: map[string]string{
+				"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
+			},
 		},
+		Detail:     detail,
 		Operations: []string{},
 	}
 }

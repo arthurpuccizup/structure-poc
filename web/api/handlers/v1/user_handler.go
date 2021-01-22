@@ -1,10 +1,10 @@
-package api
+package v1
 
 import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
-	"poc/internal/models"
+	"poc/internal/user/repository"
 
 	"github.com/google/uuid"
 	"poc/internal/errors"
@@ -38,7 +38,7 @@ func (h UserHandler) list(c echo.Context) error {
 }
 
 func (h UserHandler) save(c echo.Context) error {
-	var user models.User
+	var user repository.User
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
@@ -72,7 +72,7 @@ func (h UserHandler) update(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
 	}
 
-	var user models.User
+	var user repository.User
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())

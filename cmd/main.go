@@ -5,7 +5,7 @@ import (
 	"github.com/go-playground/validator/v10/non-standard/validators"
 	"github.com/labstack/echo"
 	"log"
-	"poc/web/api"
+	v12 "poc/web/api/handlers/v1"
 
 	userRepository "poc/internal/user/repository"
 	userUsecase "poc/internal/user/usecase"
@@ -35,7 +35,7 @@ func main() {
 	e.Validator = buildCustomValidator()
 	v1 := e.Group("/v1")
 	{
-		api.NewUserHandler(v1, userUsec)
+		v12.NewUserHandler(v1, userUsec)
 	}
 
 	log.Fatalln(e.Start(":8080"))

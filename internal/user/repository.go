@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/ZupIT/charlescd/internal/errors"
-	"github.com/ZupIT/charlescd/internal/models"
 	"github.com/google/uuid"
+	"poc/internal/errors"
+	"poc/internal/models"
 )
 
 type Repository interface {

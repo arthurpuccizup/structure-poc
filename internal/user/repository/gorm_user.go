@@ -1,11 +1,11 @@
 package repository
 
 import (
-	"github.com/ZupIT/charlescd/internal/errors"
-	"github.com/ZupIT/charlescd/internal/models"
-	"github.com/ZupIT/charlescd/internal/user"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"poc/internal/errors"
+	"poc/internal/models"
+	"poc/internal/user"
 )
 
 type gormRepository struct {

@@ -2,13 +2,13 @@ package api
 
 import (
 	"fmt"
-	"github.com/ZupIT/charlescd/internal/models"
 	"github.com/labstack/echo"
 	"net/http"
+	"poc/internal/models"
 
-	"github.com/ZupIT/charlescd/internal/errors"
-	"github.com/ZupIT/charlescd/internal/user"
 	"github.com/google/uuid"
+	"poc/internal/errors"
+	"poc/internal/user"
 )
 
 type UserHandler struct {

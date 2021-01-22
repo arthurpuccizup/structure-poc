@@ -2,19 +2,18 @@ package usecase
 
 import (
 	"encoding/json"
-	"io"
-
-	"github.com/ZupIT/charlescd/internal/errors"
-	"github.com/ZupIT/charlescd/internal/models"
-	"github.com/ZupIT/charlescd/internal/user"
 	"github.com/google/uuid"
+	"io"
+	"poc/internal/errors"
+	"poc/internal/models"
+	userPkg "poc/internal/user"
 )
 
 type userUsecase struct {
-	userRepository user.Repository
+	userRepository userPkg.Repository
 }
 
-func NewUserUsecase(r user.Repository) user.UseCase {
+func NewUserUsecase(r userPkg.Repository) userPkg.UseCase {
 	return userUsecase{
 		userRepository: r,
 	}

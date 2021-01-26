@@ -3,12 +3,13 @@ version: "3"
 services:
   postgres:
     image: postgres:11.8-alpine
+    container_name: poc-db
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_DB=charlescd
-      - POSTGRES_USER=charlescd
-      - POSTGRES_PASSWORD=charlescd
+      - POSTGRES_DB=structure_poc
+      - POSTGRES_USER=poc_user
+      - POSTGRES_PASSWORD=poc_password
       - MAX_CONNECTIONS=300
     networks:
       - development

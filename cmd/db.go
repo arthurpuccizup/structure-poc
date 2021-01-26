@@ -8,10 +8,18 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"poc/internal/configuration"
 )
 
 func ConnectDatabase() (*sql.DB, *gorm.DB, error) {
-	db, err := sql.Open("postgres", "postgres://charlescd:charlescd@localhost:5432/charlescd?sslmode=disable")
+	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		configuration.Get("DB_USER"),
+		configuration.Get("DB_PASSWORD"),
+		configuration.Get("DB_HOST"),
+		configuration.Get("DB_PORT"),
+		configuration.Get("DB_NAME"),
+		configuration.Get("DB_SSL"),
+	))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,8 +37,8 @@ func ConnectDatabase() (*sql.DB, *gorm.DB, error) {
 func RunMigrations(sqlDb *sql.DB) error {
 	driver, err := pgMigrate.WithInstance(sqlDb, &pgMigrate.Config{})
 	m, err := migrate.NewWithDatabaseInstance(
-		fmt.Sprintf("file://%s", "migrations"),
-		"charlescd", driver)
+		fmt.Sprintf("file://%s", "resources/migrations"),
+		configuration.Get("DB_NAME"), driver)
 	if err != nil {
 		return err
 	}

@@ -6,15 +6,15 @@ import (
 	"io"
 	"poc/internal/errors"
 	userPkg "poc/internal/user"
-	"poc/internal/user/repository"
+	"poc/internal/user/models"
 )
 
 type UseCase interface {
-	Parse(body io.ReadCloser) (repository.User, errors.Error)
-	FindAll() ([]repository.User, errors.Error)
-	Save(user repository.User) (repository.User, errors.Error)
-	GetByID(id uuid.UUID) (repository.User, errors.Error)
-	Update(id uuid.UUID, user repository.User) (repository.User, errors.Error)
+	Parse(body io.ReadCloser) (models.User, errors.Error)
+	FindAll() ([]models.User, errors.Error)
+	Save(user models.User) (models.User, errors.Error)
+	GetByID(id uuid.UUID) (models.User, errors.Error)
+	Update(id uuid.UUID, user models.User) (models.User, errors.Error)
 	Delete(id uuid.UUID) errors.Error
 }
 
@@ -28,29 +28,29 @@ func NewUserUsecase(r userPkg.Repository) UseCase {
 	}
 }
 
-func (u userUsecase) Parse(body io.ReadCloser) (repository.User, errors.Error) {
-	var user repository.User
+func (u userUsecase) Parse(body io.ReadCloser) (models.User, errors.Error) {
+	var user models.User
 	err := json.NewDecoder(body).Decode(&user)
 	if err != nil {
-		return repository.User{}, errors.New("User parse failed", err.Error())
+		return models.User{}, errors.New("User parse failed", err.Error())
 	}
 
 	return user, nil
 }
 
-func (u userUsecase) FindAll() ([]repository.User, errors.Error) {
+func (u userUsecase) FindAll() ([]models.User, errors.Error) {
 	return u.userRepository.FindAll()
 }
 
-func (u userUsecase) Save(user repository.User) (repository.User, errors.Error) {
+func (u userUsecase) Save(user models.User) (models.User, errors.Error) {
 	return u.userRepository.Save(user)
 }
 
-func (u userUsecase) GetByID(id uuid.UUID) (repository.User, errors.Error) {
+func (u userUsecase) GetByID(id uuid.UUID) (models.User, errors.Error) {
 	return u.userRepository.GetByID(id)
 }
 
-func (u userUsecase) Update(id uuid.UUID, user repository.User) (repository.User, errors.Error) {
+func (u userUsecase) Update(id uuid.UUID, user models.User) (models.User, errors.Error) {
 	return u.userRepository.Update(id, user)
 }
 

@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
-	"poc/internal/user/repository"
+	"poc/internal/user/models"
+	userUsecase "poc/internal/user/usecase"
 
 	"github.com/google/uuid"
 	"poc/internal/errors"
-	"poc/internal/user"
 )
 
 type UserHandler struct {
-	usecase user.UseCase
+	usecase userUsecase.UseCase
 }
 
-func NewUserHandler(e *echo.Group, u user.UseCase) {
+func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
 	handler := UserHandler{
 		usecase: u,
 	}
@@ -38,7 +38,7 @@ func (h UserHandler) list(c echo.Context) error {
 }
 
 func (h UserHandler) save(c echo.Context) error {
-	var user repository.User
+	var user models.User
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
@@ -72,7 +72,7 @@ func (h UserHandler) update(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
 	}
 
-	var user repository.User
+	var user models.User
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())

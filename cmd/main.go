@@ -5,10 +5,11 @@ import (
 	"github.com/go-playground/validator/v10/non-standard/validators"
 	"github.com/labstack/echo"
 	"log"
-	v12 "poc/web/api/handlers/v1"
+	"poc/internal/configuration"
+	v1Pkg "poc/web/api/handlers/v1"
 
 	userRepository "poc/internal/user/repository"
-	userUsecase "poc/internal/user/usecase"
+	userUseCases "poc/internal/user/usecase"
 )
 
 type CustomValidator struct {
@@ -16,7 +17,10 @@ type CustomValidator struct {
 }
 
 func main() {
-	//TODO: Implement viper or godotenv for env vars
+	err := configuration.LoadConfigurations()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	sqlDB, gormDB, err := ConnectDatabase()
 	if err != nil {
@@ -29,13 +33,13 @@ func main() {
 	}
 
 	userRepo := userRepository.NewGormUserRepository(gormDB)
-	userUsec := userUsecase.NewUserUsecase(userRepo)
+	userUsec := userUseCases.NewUserUsecase(userRepo)
 
 	e := echo.New()
 	e.Validator = buildCustomValidator()
 	v1 := e.Group("/v1")
 	{
-		v12.NewUserHandler(v1, userUsec)
+		v1Pkg.NewUserHandler(v1, userUsec)
 	}
 
 	log.Fatalln(e.Start(":8080"))

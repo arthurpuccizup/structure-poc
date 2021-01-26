@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
-	"poc/internal/user/models"
 	userUsecase "poc/internal/user/usecase"
+	"poc/web/api/handlers/v1/representation"
 
-	"github.com/google/uuid"
+	uuidPkg "github.com/google/uuid"
 	"poc/internal/errors"
 )
 
@@ -28,71 +28,86 @@ func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
 	e.DELETE(fmt.Sprintf("%s/%s", path, ":userId"), handler.delete)
 }
 
-func (h UserHandler) list(c echo.Context) error {
-	users, err := h.usecase.FindAll()
+func (handler UserHandler) list(c echo.Context) error {
+	users, err := handler.usecase.FindAll()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
 	}
 
-	return c.JSON(http.StatusOK, users)
+	usersResponse := make([]representation.UserResponse, 0)
+	for _, user := range users {
+		usersResponse = append(usersResponse, representation.FromDomainToResponse(user))
+	}
+
+	return c.JSON(http.StatusOK, usersResponse)
 }
 
-func (h UserHandler) save(c echo.Context) error {
-	var user models.User
+func (handler UserHandler) save(c echo.Context) error {
+	var user representation.UserRequest
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
 	}
 
-	createdUser, err := h.usecase.Save(user)
+	validationErr := c.Validate(user)
+	if validationErr != nil {
+		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr.Error()).SensitiveError())
+	}
+
+	createdUser, err := handler.usecase.Save(user.ToUserDomain())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
 	}
 
-	return c.JSON(http.StatusCreated, createdUser)
+	return c.JSON(http.StatusCreated, representation.FromDomainToResponse(createdUser))
 }
 
-func (h UserHandler) getById(c echo.Context) error {
-	uuid, parseErr := uuid.Parse(c.Param("userId"))
+func (handler UserHandler) getById(c echo.Context) error {
+	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
 	}
 
-	user, err := h.usecase.GetByID(uuid)
+	user, err := handler.usecase.GetByID(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
 	}
 
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, representation.FromDomainToResponse(user))
 }
 
-func (h UserHandler) update(c echo.Context) error {
-	uuid, parseErr := uuid.Parse(c.Param("userId"))
+func (handler UserHandler) update(c echo.Context) error {
+	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
 	}
 
-	var user models.User
+	var user representation.UserRequest
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
 	}
 
-	user, err := h.usecase.Update(uuid, user)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
+	validationErr := c.Validate(user)
+	if validationErr != nil {
+		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr.Error()).SensitiveError())
 	}
 
-	return c.JSON(http.StatusOK, user)
+	updatedUser, err := handler.usecase.Update(uuid, user.ToUserDomain())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+	}
+
+	return c.JSON(http.StatusOK, representation.FromDomainToResponse(updatedUser))
 }
 
-func (h UserHandler) delete(c echo.Context) error {
-	uuid, parseErr := uuid.Parse(c.Param("userId"))
+func (handler UserHandler) delete(c echo.Context) error {
+	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
 	}
 
-	err := h.usecase.Delete(uuid)
+	err := handler.usecase.Delete(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
 	}

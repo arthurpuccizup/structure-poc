@@ -1,20 +1,17 @@
 package usecase
 
 import (
-	"encoding/json"
 	"github.com/google/uuid"
-	"io"
 	"poc/internal/errors"
 	userPkg "poc/internal/user"
-	"poc/internal/user/models"
+	"poc/internal/user/domain"
 )
 
 type UseCase interface {
-	Parse(body io.ReadCloser) (models.User, errors.Error)
-	FindAll() ([]models.User, errors.Error)
-	Save(user models.User) (models.User, errors.Error)
-	GetByID(id uuid.UUID) (models.User, errors.Error)
-	Update(id uuid.UUID, user models.User) (models.User, errors.Error)
+	FindAll() ([]domain.User, errors.Error)
+	Save(user domain.User) (domain.User, errors.Error)
+	GetByID(id uuid.UUID) (domain.User, errors.Error)
+	Update(id uuid.UUID, user domain.User) (domain.User, errors.Error)
 	Delete(id uuid.UUID) errors.Error
 }
 
@@ -28,30 +25,45 @@ func NewUserUsecase(r userPkg.Repository) UseCase {
 	}
 }
 
-func (u userUsecase) Parse(body io.ReadCloser) (models.User, errors.Error) {
-	var user models.User
-	err := json.NewDecoder(body).Decode(&user)
+func (u userUsecase) FindAll() ([]domain.User, errors.Error) {
+	users, err := u.userRepository.FindAll()
 	if err != nil {
-		return models.User{}, errors.New("User parse failed", err.Error())
+		return make([]domain.User, 0), err
 	}
 
-	return user, nil
+	domainUsers := make([]domain.User, 0)
+	for _, u := range users {
+		domainUsers = append(domainUsers, domain.FromUserModel(u))
+	}
+
+	return domainUsers, nil
 }
 
-func (u userUsecase) FindAll() ([]models.User, errors.Error) {
-	return u.userRepository.FindAll()
+func (u userUsecase) Save(user domain.User) (domain.User, errors.Error) {
+	savedUser, err := u.userRepository.Save(user.ToUserModel())
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return domain.FromUserModel(savedUser), nil
 }
 
-func (u userUsecase) Save(user models.User) (models.User, errors.Error) {
-	return u.userRepository.Save(user)
+func (u userUsecase) GetByID(id uuid.UUID) (domain.User, errors.Error) {
+	user, err := u.userRepository.GetByID(id)
+	if err != nil {
+		return domain.User{}, err
+	}
+
+	return domain.FromUserModel(user), nil
 }
 
-func (u userUsecase) GetByID(id uuid.UUID) (models.User, errors.Error) {
-	return u.userRepository.GetByID(id)
-}
+func (u userUsecase) Update(id uuid.UUID, user domain.User) (domain.User, errors.Error) {
+	updatedUser, err := u.userRepository.Update(id, user.ToUserModel())
+	if err != nil {
+		return domain.User{}, err
+	}
 
-func (u userUsecase) Update(id uuid.UUID, user models.User) (models.User, errors.Error) {
-	return u.userRepository.Update(id, user)
+	return domain.FromUserModel(updatedUser), nil
 }
 
 func (u userUsecase) Delete(id uuid.UUID) errors.Error {

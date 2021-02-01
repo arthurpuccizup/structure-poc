@@ -50,7 +50,7 @@ func (e *sensitiveError) Marshal() ([]byte, error) {
 	return json.Marshal(&e)
 }
 
-func New(title, detail string) Error {
+func New(title, detail string) *sensitiveError {
 	return &sensitiveError{
 		customError: customError{
 			ID:    uuid.New(),

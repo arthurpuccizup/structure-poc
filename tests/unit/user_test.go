@@ -1,22 +1,15 @@
 package unit
 
 import (
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"poc/internal/user/models"
-	userUsecase "poc/internal/user/usecase"
-	"poc/tests/unit/mocks"
-	"testing"
 )
 
 type UserSuite struct {
 	suite.Suite
-	userUC             userUsecase.UseCase
-	userRepositoryMock *mocks.UserRepositoryMock
+	//userUC userUsecase.UseCase
 }
 
+/*
 func (u *UserSuite) SetupSuite() {
 	u.userRepositoryMock = new(mocks.UserRepositoryMock)
 	u.userUC = userUsecase.NewUserUsecase(u.userRepositoryMock)
@@ -40,3 +33,4 @@ func (u *UserSuite) TestAnother() {
 	require.NotNil(u.T(), a)
 	require.Nil(u.T(), err)
 }
+*/

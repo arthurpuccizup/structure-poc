@@ -1,5 +1,7 @@
 package hack
 
 import (
-	_ "github.com/vektra/mockery"
+	_ "github.com/vektra/mockery/v2"
 )
+
+

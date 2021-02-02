@@ -29,3 +29,6 @@ unit-tests-with-cover:mocks
 
 unit-tests-with-cover-html:unit-tests-with-cover
 				$(GOTOOL) cover -html=cover.out -o cover.html
+
+license:build
+				./hack/license/golicense ./hack/license/config.json ./$(BINARY_NAME)

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 	userUsecase "poc/internal/user/usecase"
@@ -20,12 +19,14 @@ func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
 		usecase: u,
 	}
 
-	path := "/users"
-	e.GET(path, handler.list)
-	e.POST(path, handler.save)
-	e.GET(fmt.Sprintf("%s/%s", path, ":userId"), handler.getById)
-	e.PUT(fmt.Sprintf("%s/%s", path, ":userId"), handler.update)
-	e.DELETE(fmt.Sprintf("%s/%s", path, ":userId"), handler.delete)
+	users := e.Group("/users")
+	{
+		users.GET("", handler.list)
+		users.POST("", handler.save)
+		users.GET("/:userId", handler.getById)
+		e.PUT("/:userId", handler.update)
+		e.DELETE("/:userId", handler.delete)
+	}
 }
 
 func (handler UserHandler) list(c echo.Context) error {

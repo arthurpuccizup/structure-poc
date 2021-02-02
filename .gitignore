@@ -1,2 +1,4 @@
-./ideia
-./vendor
+/ideia/
+/vendor/
+/cover.html
+/cover.out

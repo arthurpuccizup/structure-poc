@@ -1,6 +1,6 @@
 #!/bin/bash
 
-migrations_path="migrations"
+migrations_path="../resources/migrations"
 today=`date +%Y%m%d%H%M%S`
 
 touch "${migrations_path}/${today}_$1.down.sql"

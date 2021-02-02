@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/non-standard/validators"
 	"github.com/labstack/echo"
+	"gorm.io/gorm"
 	"log"
 	"poc/internal/configuration"
 	v1Pkg "poc/web/api/handlers/v1"
@@ -18,24 +20,47 @@ type CustomValidator struct {
 }
 
 func main() {
-	err := configuration.LoadConfigurations()
+
+	err := loadEnvConfig()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 
+	gormDB, err := prepareDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http, err := buildHttpHandlers(gormDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Fatalln(http.Start(":8080"))
+}
+
+func loadEnvConfig() error {
+	return configuration.LoadConfigurations()
+}
+
+func prepareDatabase() (*gorm.DB, error) {
 	sqlDB, gormDB, err := ConnectDatabase()
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	err = RunMigrations(sqlDB)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
+	return gormDB, nil
+}
+
+func buildHttpHandlers(gormDB *gorm.DB) (*echo.Echo, error) {
 	userRepo, err := userRepositoryPkg.NewPostgresUserRepository(gormDB)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
+		return nil, errors.New(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
 	}
 	userUseCase := userUseCasesPkg.NewUserUsecase(userRepo)
 
@@ -46,7 +71,7 @@ func main() {
 		v1Pkg.NewUserHandler(v1, userUseCase)
 	}
 
-	log.Fatalln(e.Start(":8080"))
+	return e, nil
 }
 
 func buildCustomValidator() *CustomValidator {

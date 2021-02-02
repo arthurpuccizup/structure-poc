@@ -5,14 +5,15 @@ import (
 	"poc/internal/errors"
 	userPkg "poc/internal/user"
 	"poc/internal/user/domain"
+	"poc/internal/user/models"
 )
 
 type UseCase interface {
-	FindAll() ([]domain.User, errors.Error)
-	Save(user domain.User) (domain.User, errors.Error)
-	GetByID(id uuid.UUID) (domain.User, errors.Error)
-	Update(id uuid.UUID, user domain.User) (domain.User, errors.Error)
-	Delete(id uuid.UUID) errors.Error
+	FindAll() ([]domain.User, error)
+	Save(user domain.User) (domain.User, error)
+	GetByID(id uuid.UUID) (domain.User, error)
+	Update(id uuid.UUID, user domain.User) (domain.User, error)
+	Delete(id uuid.UUID) error
 }
 
 type userUsecase struct {
@@ -25,47 +26,47 @@ func NewUserUsecase(r userPkg.Repository) UseCase {
 	}
 }
 
-func (u userUsecase) FindAll() ([]domain.User, errors.Error) {
+func (u userUsecase) FindAll() ([]domain.User, error) {
 	users, err := u.userRepository.FindAll()
 	if err != nil {
-		return make([]domain.User, 0), err
+		return make([]domain.User, 0), errors.WithOperation(err, "UserUseCase.FindAll")
 	}
 
 	domainUsers := make([]domain.User, 0)
 	for _, u := range users {
-		domainUsers = append(domainUsers, domain.FromUserModel(u))
+		domainUsers = append(domainUsers, domain.User(u))
 	}
 
 	return domainUsers, nil
 }
 
-func (u userUsecase) Save(user domain.User) (domain.User, errors.Error) {
-	savedUser, err := u.userRepository.Save(user.ToUserModel())
+func (u userUsecase) Save(user domain.User) (domain.User, error) {
+	savedUser, err := u.userRepository.Save(models.User(user))
 	if err != nil {
-		return domain.User{}, err
+		return domain.User{}, errors.WithOperation(err, "UserUseCase.Save")
 	}
 
-	return domain.FromUserModel(savedUser), nil
+	return domain.User(savedUser), nil
 }
 
-func (u userUsecase) GetByID(id uuid.UUID) (domain.User, errors.Error) {
+func (u userUsecase) GetByID(id uuid.UUID) (domain.User, error) {
 	user, err := u.userRepository.GetByID(id)
 	if err != nil {
-		return domain.User{}, err
+		return domain.User{}, errors.WithOperation(err, "UserUseCase.GetById")
 	}
 
-	return domain.FromUserModel(user), nil
+	return domain.User(user), nil
 }
 
-func (u userUsecase) Update(id uuid.UUID, user domain.User) (domain.User, errors.Error) {
-	updatedUser, err := u.userRepository.Update(id, user.ToUserModel())
+func (u userUsecase) Update(id uuid.UUID, user domain.User) (domain.User, error) {
+	updatedUser, err := u.userRepository.Update(id, models.User(user))
 	if err != nil {
-		return domain.User{}, err
+		return domain.User{}, errors.WithOperation(err, "UserUseCase.Update")
 	}
 
-	return domain.FromUserModel(updatedUser), nil
+	return domain.User(updatedUser), nil
 }
 
-func (u userUsecase) Delete(id uuid.UUID) errors.Error {
+func (u userUsecase) Delete(id uuid.UUID) error {
 	return u.userRepository.Delete(id)
 }

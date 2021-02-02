@@ -3,11 +3,9 @@
 package mocks
 
 import (
-	errors "poc/internal/errors"
+	models "poc/internal/user/models"
 
 	mock "github.com/stretchr/testify/mock"
-
-	models "poc/internal/user/models"
 
 	uuid "github.com/google/uuid"
 )
@@ -18,23 +16,21 @@ type Repository struct {
 }
 
 // Delete provides a mock function with given fields: id
-func (_m *Repository) Delete(id uuid.UUID) errors.Error {
+func (_m *Repository) Delete(id uuid.UUID) error {
 	ret := _m.Called(id)
 
-	var r0 errors.Error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) errors.Error); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
 		r0 = rf(id)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(errors.Error)
-		}
+		r0 = ret.Error(0)
 	}
 
 	return r0
 }
 
 // FindAll provides a mock function with given fields:
-func (_m *Repository) FindAll() ([]models.User, errors.Error) {
+func (_m *Repository) FindAll() ([]models.User, error) {
 	ret := _m.Called()
 
 	var r0 []models.User
@@ -46,20 +42,18 @@ func (_m *Repository) FindAll() ([]models.User, errors.Error) {
 		}
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func() errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // FindAllCustom provides a mock function with given fields:
-func (_m *Repository) FindAllCustom() ([]models.User, errors.Error) {
+func (_m *Repository) FindAllCustom() ([]models.User, error) {
 	ret := _m.Called()
 
 	var r0 []models.User
@@ -71,20 +65,18 @@ func (_m *Repository) FindAllCustom() ([]models.User, errors.Error) {
 		}
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func() errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // GetByID provides a mock function with given fields: id
-func (_m *Repository) GetByID(id uuid.UUID) (models.User, errors.Error) {
+func (_m *Repository) GetByID(id uuid.UUID) (models.User, error) {
 	ret := _m.Called(id)
 
 	var r0 models.User
@@ -94,20 +86,18 @@ func (_m *Repository) GetByID(id uuid.UUID) (models.User, errors.Error) {
 		r0 = ret.Get(0).(models.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(uuid.UUID) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
 		r1 = rf(id)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // Save provides a mock function with given fields: _a0
-func (_m *Repository) Save(_a0 models.User) (models.User, errors.Error) {
+func (_m *Repository) Save(_a0 models.User) (models.User, error) {
 	ret := _m.Called(_a0)
 
 	var r0 models.User
@@ -117,20 +107,18 @@ func (_m *Repository) Save(_a0 models.User) (models.User, errors.Error) {
 		r0 = ret.Get(0).(models.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(models.User) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(models.User) error); ok {
 		r1 = rf(_a0)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // Update provides a mock function with given fields: id, _a1
-func (_m *Repository) Update(id uuid.UUID, _a1 models.User) (models.User, errors.Error) {
+func (_m *Repository) Update(id uuid.UUID, _a1 models.User) (models.User, error) {
 	ret := _m.Called(id, _a1)
 
 	var r0 models.User
@@ -140,13 +128,11 @@ func (_m *Repository) Update(id uuid.UUID, _a1 models.User) (models.User, errors
 		r0 = ret.Get(0).(models.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(uuid.UUID, models.User) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uuid.UUID, models.User) error); ok {
 		r1 = rf(id, _a1)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1

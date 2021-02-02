@@ -3,7 +3,6 @@
 package mocks
 
 import (
-	errors "poc/internal/errors"
 	domain "poc/internal/user/domain"
 
 	mock "github.com/stretchr/testify/mock"
@@ -17,23 +16,21 @@ type UseCase struct {
 }
 
 // Delete provides a mock function with given fields: id
-func (_m *UseCase) Delete(id uuid.UUID) errors.Error {
+func (_m *UseCase) Delete(id uuid.UUID) error {
 	ret := _m.Called(id)
 
-	var r0 errors.Error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) errors.Error); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
 		r0 = rf(id)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(errors.Error)
-		}
+		r0 = ret.Error(0)
 	}
 
 	return r0
 }
 
 // FindAll provides a mock function with given fields:
-func (_m *UseCase) FindAll() ([]domain.User, errors.Error) {
+func (_m *UseCase) FindAll() ([]domain.User, error) {
 	ret := _m.Called()
 
 	var r0 []domain.User
@@ -45,20 +42,18 @@ func (_m *UseCase) FindAll() ([]domain.User, errors.Error) {
 		}
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func() errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // GetByID provides a mock function with given fields: id
-func (_m *UseCase) GetByID(id uuid.UUID) (domain.User, errors.Error) {
+func (_m *UseCase) GetByID(id uuid.UUID) (domain.User, error) {
 	ret := _m.Called(id)
 
 	var r0 domain.User
@@ -68,20 +63,18 @@ func (_m *UseCase) GetByID(id uuid.UUID) (domain.User, errors.Error) {
 		r0 = ret.Get(0).(domain.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(uuid.UUID) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
 		r1 = rf(id)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // Save provides a mock function with given fields: user
-func (_m *UseCase) Save(user domain.User) (domain.User, errors.Error) {
+func (_m *UseCase) Save(user domain.User) (domain.User, error) {
 	ret := _m.Called(user)
 
 	var r0 domain.User
@@ -91,20 +84,18 @@ func (_m *UseCase) Save(user domain.User) (domain.User, errors.Error) {
 		r0 = ret.Get(0).(domain.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(domain.User) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(domain.User) error); ok {
 		r1 = rf(user)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1
 }
 
 // Update provides a mock function with given fields: id, user
-func (_m *UseCase) Update(id uuid.UUID, user domain.User) (domain.User, errors.Error) {
+func (_m *UseCase) Update(id uuid.UUID, user domain.User) (domain.User, error) {
 	ret := _m.Called(id, user)
 
 	var r0 domain.User
@@ -114,13 +105,11 @@ func (_m *UseCase) Update(id uuid.UUID, user domain.User) (domain.User, errors.E
 		r0 = ret.Get(0).(domain.User)
 	}
 
-	var r1 errors.Error
-	if rf, ok := ret.Get(1).(func(uuid.UUID, domain.User) errors.Error); ok {
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uuid.UUID, domain.User) error); ok {
 		r1 = rf(id, user)
 	} else {
-		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(errors.Error)
-		}
+		r1 = ret.Error(1)
 	}
 
 	return r0, r1

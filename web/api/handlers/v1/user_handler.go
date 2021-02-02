@@ -32,7 +32,7 @@ func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
 func (handler UserHandler) list(c echo.Context) error {
 	users, err := handler.usecase.FindAll()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	usersResponse := make([]representation.UserResponse, 0)
@@ -47,17 +47,17 @@ func (handler UserHandler) save(c echo.Context) error {
 	var user representation.UserRequest
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr, nil))
 	}
 
 	validationErr := c.Validate(user)
 	if validationErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr, nil))
 	}
 
 	createdUser, err := handler.usecase.Save(user.ToUserDomain())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusCreated, representation.FromDomainToResponse(createdUser))
@@ -66,12 +66,12 @@ func (handler UserHandler) save(c echo.Context) error {
 func (handler UserHandler) getById(c echo.Context) error {
 	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr, nil))
 	}
 
 	user, err := handler.usecase.GetByID(uuid)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, representation.FromDomainToResponse(user))
@@ -80,23 +80,23 @@ func (handler UserHandler) getById(c echo.Context) error {
 func (handler UserHandler) update(c echo.Context) error {
 	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr, nil))
 	}
 
 	var user representation.UserRequest
 	bindErr := c.Bind(&user)
 	if bindErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Cant parse body", bindErr, nil))
 	}
 
 	validationErr := c.Validate(user)
 	if validationErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr, nil))
 	}
 
 	updatedUser, err := handler.usecase.Update(uuid, user.ToUserDomain())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, representation.FromDomainToResponse(updatedUser))
@@ -105,12 +105,12 @@ func (handler UserHandler) update(c echo.Context) error {
 func (handler UserHandler) delete(c echo.Context) error {
 	uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 	if parseErr != nil {
-		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr.Error()).SensitiveError())
+		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr, nil))
 	}
 
 	err := handler.usecase.Delete(uuid)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.SensitiveError())
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusNoContent, nil)

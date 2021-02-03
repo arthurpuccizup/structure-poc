@@ -3,7 +3,7 @@ package v1
 import (
 	"github.com/labstack/echo"
 	"net/http"
-	userUsecase "poc/internal/user/usecase"
+	userInteractor "poc/internal/use_case/user"
 	"poc/web/api/handlers/v1/representation"
 
 	uuidPkg "github.com/google/uuid"
@@ -11,12 +11,23 @@ import (
 )
 
 type UserHandler struct {
-	usecase userUsecase.UseCase
+	findAllUsers userInteractor.FindAllUsers
+	saveUser     userInteractor.SaveUser
+	updateUser   userInteractor.UpdateUser
+	deleteUser   userInteractor.DeleteUser
+	findUserById userInteractor.FindUserById
 }
 
-func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
+func NewUserHandler(e *echo.Group, findAllUsers userInteractor.FindAllUsers, saveUser userInteractor.SaveUser, updateUser userInteractor.UpdateUser,
+	deleteUser userInteractor.DeleteUser,
+	findUserById userInteractor.FindUserById) {
+
 	handler := UserHandler{
-		usecase: u,
+		findAllUsers: findAllUsers,
+		saveUser:     saveUser,
+		updateUser:   updateUser,
+		deleteUser:   deleteUser,
+		findUserById: findUserById,
 	}
 
 	users := e.Group("/users")
@@ -24,13 +35,19 @@ func NewUserHandler(e *echo.Group, u userUsecase.UseCase) {
 		users.GET("", handler.list)
 		users.POST("", handler.save)
 		users.GET("/:userId", handler.getById)
-		e.PUT("/:userId", handler.update)
-		e.DELETE("/:userId", handler.delete)
+		users.PUT("/:userId", handler.update)
+		users.DELETE("/:userId", handler.delete)
 	}
 }
 
+// @Title List users.
+// @Description List all users registered.
+// @Success  200  array  representation.UserResponse  "The users registered"
+// @Error  200  array  representation.UserResponse  "The users registered"
+// @Resource users
+// @Route /v1/users [get]
 func (handler UserHandler) list(c echo.Context) error {
-	users, err := handler.usecase.FindAll()
+	users, err := handler.findAllUsers.Execute()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -55,7 +72,7 @@ func (handler UserHandler) save(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr, nil))
 	}
 
-	createdUser, err := handler.usecase.Save(user.ToUserDomain())
+	createdUser, err := handler.saveUser.Execute(user.ToUserDomain())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -69,7 +86,7 @@ func (handler UserHandler) getById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr, nil))
 	}
 
-	user, err := handler.usecase.GetByID(uuid)
+	user, err := handler.findUserById.Execute(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -94,7 +111,7 @@ func (handler UserHandler) update(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Invalid Fields", validationErr, nil))
 	}
 
-	updatedUser, err := handler.usecase.Update(uuid, user.ToUserDomain())
+	updatedUser, err := handler.updateUser.Execute(uuid, user.ToUserDomain())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -108,7 +125,7 @@ func (handler UserHandler) delete(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("Parse id failed", parseErr, nil))
 	}
 
-	err := handler.usecase.Delete(uuid)
+	err := handler.deleteUser.Execute(uuid)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

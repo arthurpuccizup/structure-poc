@@ -1,0 +1,82 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "POC - API",
+    "description": "POC API, responsible for being the base model for other projects",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Default Server URL"
+    }
+  ],
+  "paths": {
+    "/v1/users": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The users registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/poc.web.api.handlers.v1.representation.UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "summary": "List users.",
+        "description": " List all users registered."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "github.com.google.uuid.UUID": {
+        "type": "array",
+        "items": {}
+      },
+      "poc.web.api.handlers.v1.representation.UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "array",
+            "description": "The user identifier",
+            "items": {},
+            "example": "invalid example"
+          },
+          "name": {
+            "type": "string",
+            "description": "The user name",
+            "example": "Fulano da Silva"
+          },
+          "email": {
+            "type": "string",
+            "description": "The user email",
+            "example": "user@email.com"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "AuthorizationHeader": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Inuput your token"
+      }
+    }
+  },
+  "security": [
+    {
+      "AuthorizationHeader": []
+    }
+  ]
+}

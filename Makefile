@@ -8,6 +8,7 @@ GOTOOL=$(GOCMD) tool
 GOMOD=$(GOCMD) mod
 
 CMD_PATH=cmd/*.go
+VEND_PATH=./vendor
 BINARY_NAME=poc
 
 start:
@@ -16,9 +17,11 @@ start:
 build:
 				$(GOBUILD) -o ./$(BINARY_NAME) $(CMD_PATH)
 
-mocks:
+vendor:
 				$(GOMOD) vendor
-				$(GORUN) ./vendor/github.com/vektra/mockery/v2/main.go --all --dir ./internal --output ./tests/unit/mocks/ --keeptree --case underscore
+
+mocks:vendor
+				$(GORUN) $(VEND_PATH)/github.com/vektra/mockery/v2/main.go --all --dir ./internal --output ./tests/unit/mocks/ --keeptree --case underscore
 
 unit-tests:mocks
 				$(GOTEST) ./tests/unit
@@ -32,3 +35,6 @@ unit-tests-with-cover-html:unit-tests-with-cover
 
 license:build
 				./hack/license/golicense ./hack/license/config.json ./$(BINARY_NAME)
+
+generate-oas:vendor
+				$(GORUN) $(VEND_PATH)/github.com/mikunalpha/goas --module-path . --main-file-path ./cmd/main.go --output ./oas.json

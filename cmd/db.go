@@ -11,6 +11,20 @@ import (
 	"poc/internal/configuration"
 )
 
+func prepareDatabase() (*gorm.DB, error) {
+	sqlDB, gormDB, err := ConnectDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	err = RunMigrations(sqlDB)
+	if err != nil {
+		return nil, err
+	}
+
+	return gormDB, nil
+}
+
 func ConnectDatabase() (*sql.DB, *gorm.DB, error) {
 	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		configuration.Get("DB_USER"),

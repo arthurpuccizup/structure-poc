@@ -5,21 +5,21 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	models2 "poc/internal/repository/models"
+	"poc/internal/repository/models"
 	"poc/internal/use_case/user"
-	mocks "poc/tests/unit/mocks/user"
+	mocks "poc/tests/unit/mocks/repository"
 	"testing"
 )
 
 type UserSuite struct {
 	suite.Suite
-	userUC      user.UseCase
-	userRepMock *mocks.Repository
+	findUserById user.FindUserById
+	userRep      *mocks.UserRepository
 }
 
 func (u *UserSuite) SetupSuite() {
-	u.userRepMock = new(mocks.Repository)
-	u.userUC = user.NewUserUsecase(u.userRepMock)
+	u.userRep = new(mocks.UserRepository)
+	u.findUserById = user.NewFindUserById(u.userRep)
 }
 
 func TestExampleTestSuite(t *testing.T) {
@@ -27,8 +27,8 @@ func TestExampleTestSuite(t *testing.T) {
 }
 
 func (u *UserSuite) TestGetByID() {
-	u.userRepMock.On("GetByID", mock.Anything).Return(models2.User{ID: uuid.New()}, nil)
-	a, err := u.userUC.GetByID(uuid.New())
+	u.userRep.On("GetByID", mock.Anything).Return(models.User{ID: uuid.New()}, nil)
+	a, err := u.findUserById.Execute(uuid.New())
 
 	require.NotNil(u.T(), a)
 	require.Nil(u.T(), err)

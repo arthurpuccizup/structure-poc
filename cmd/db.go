@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 	"poc/internal/configuration"
 	"poc/internal/repository"
-	repositoryImpl "poc/internal/repository/impl"
 )
 
 type persistenceManager struct {
@@ -72,7 +71,7 @@ func runMigrations(sqlDb *sql.DB) error {
 }
 
 func loadPersistenceManager(db *gorm.DB) (persistenceManager, error) {
-	userRepo, err := repositoryImpl.NewPostgresUserRepository(db)
+	userRepo, err := repository.NewUserRepository(db)
 	if err != nil {
 		return persistenceManager{}, errors.New(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
 	}

@@ -57,9 +57,13 @@ func buildCustomValidator() *CustomValidator {
 func (s server) registerRoutes() {
 	v1 := s.echo.Group("/v1")
 	{
-		circleHandler := v1.Group("/users")
+		userHandler := v1.Group("/users")
 		{
-			circleHandler.GET("", handlersV1.ListUsers(user.NewFindAllUsers(s.pm.userRepository)))
+			userHandler.GET("", handlersV1.ListUsers(user.NewFindAllUsers(s.pm.userRepository)))
+			userHandler.POST("", handlersV1.CreateUser(user.NewCreateUser(s.pm.userRepository)))
+			userHandler.GET("/:id", handlersV1.FindUserById(user.NewFindUserById(s.pm.userRepository)))
+			userHandler.PUT("/:id", handlersV1.UpdateUser(user.NewUpdateUser(s.pm.userRepository)))
+			userHandler.DELETE("/:id", handlersV1.DeleteUSer(user.NewDeleteUser(s.pm.userRepository)))
 		}
 	}
 }

@@ -14,7 +14,7 @@ type saveUser struct {
 	userRepository repository.UserRepository
 }
 
-func NewSaveUser(r repository.UserRepository) SaveUser {
+func NewCreateUser(r repository.UserRepository) SaveUser {
 	return saveUser{
 		userRepository: r,
 	}

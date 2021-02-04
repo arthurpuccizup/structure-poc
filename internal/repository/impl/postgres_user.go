@@ -54,11 +54,11 @@ func (r postgresRepository) FindAllCustom() ([]domain.User, error) {
 	return usersFound, nil
 }
 
-func (r postgresRepository) Save(user domain.User) (domain.User, error) {
+func (r postgresRepository) Create(user domain.User) (domain.User, error) {
 	user.ID = uuid.New()
 	userToSave := models.User(user)
 	if res := r.db.Save(&userToSave); res.Error != nil {
-		return domain.User{}, errors.New("Save user failed", res.Error, nil, "repository.Save.Save")
+		return domain.User{}, errors.New("Save user failed", res.Error, nil, "repository.Create.Save")
 	}
 
 	return user, nil
@@ -68,7 +68,7 @@ func (r postgresRepository) GetByID(id uuid.UUID) (domain.User, error) {
 	var user models.User
 
 	if res := r.db.Model(models.User{}).Where("id = ?", id).First(&user); res.Error != nil {
-		return domain.User{}, errors.New("Find user failed", res.Error, nil, "repository.Save.First")
+		return domain.User{}, errors.New("Find user failed", res.Error, nil, "repository.GetById.First")
 	}
 
 	return domain.User(user), nil

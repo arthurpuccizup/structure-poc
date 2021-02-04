@@ -21,7 +21,7 @@ func NewSaveUser(r repository.UserRepository) SaveUser {
 }
 
 func (u saveUser) Execute(user domain.User) (domain.User, error) {
-	savedUser, err := u.userRepository.Save(user)
+	savedUser, err := u.userRepository.Create(user)
 	if err != nil {
 		return domain.User{}, errors.WithOperation(err, "saveUser.Execute")
 	}

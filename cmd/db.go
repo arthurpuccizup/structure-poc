@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	pgMigrate "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -9,23 +10,29 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"poc/internal/configuration"
+	"poc/internal/repository"
+	repositoryImpl "poc/internal/repository/impl"
 )
 
-func prepareDatabase() (*gorm.DB, error) {
-	sqlDB, gormDB, err := ConnectDatabase()
-	if err != nil {
-		return nil, err
-	}
-
-	err = RunMigrations(sqlDB)
-	if err != nil {
-		return nil, err
-	}
-
-	return gormDB, nil
+type persistenceManager struct {
+	userRepository repository.UserRepository
 }
 
-func ConnectDatabase() (*sql.DB, *gorm.DB, error) {
+func prepareDatabase() (persistenceManager, error) {
+	sqlDB, gormDB, err := connectDatabase()
+	if err != nil {
+		return persistenceManager{}, err
+	}
+
+	err = runMigrations(sqlDB)
+	if err != nil {
+		return persistenceManager{}, err
+	}
+
+	return loadPersistenceManager(gormDB)
+}
+
+func connectDatabase() (*sql.DB, *gorm.DB, error) {
 	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		configuration.Get("DB_USER"),
 		configuration.Get("DB_PASSWORD"),
@@ -48,7 +55,7 @@ func ConnectDatabase() (*sql.DB, *gorm.DB, error) {
 	return db, gormDb, nil
 }
 
-func RunMigrations(sqlDb *sql.DB) error {
+func runMigrations(sqlDb *sql.DB) error {
 	driver, err := pgMigrate.WithInstance(sqlDb, &pgMigrate.Config{})
 	m, err := migrate.NewWithDatabaseInstance(
 		fmt.Sprintf("file://%s", "resources/migrations"),
@@ -62,4 +69,15 @@ func RunMigrations(sqlDb *sql.DB) error {
 	}
 
 	return nil
+}
+
+func loadPersistenceManager(db *gorm.DB) (persistenceManager, error) {
+	userRepo, err := repositoryImpl.NewPostgresUserRepository(db)
+	if err != nil {
+		return persistenceManager{}, errors.New(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
+	}
+
+	return persistenceManager{
+		userRepository: userRepo,
+	}, nil
 }

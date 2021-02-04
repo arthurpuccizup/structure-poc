@@ -16,12 +16,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	gormDB, err := prepareDatabase()
+	persistenceManager, err := prepareDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	http, err := buildHttpHandlers(gormDB)
+	http, err := buildHttpHandlers(persistenceManager)
 	if err != nil {
 		log.Fatal(err)
 	}

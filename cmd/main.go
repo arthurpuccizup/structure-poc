@@ -21,10 +21,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http, err := buildHttpHandlers(persistenceManager)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Fatalln(http.Start(":8080"))
+	log.Fatalln(newServer(persistenceManager).start("8080"))
 }

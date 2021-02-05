@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"github.com/gchaincl/dotsql"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/nleof/goyesql"
 	"gorm.io/gorm"
 	"poc/internal/domain"
 	"poc/internal/errors"
-	models "poc/internal/repository/models"
+	"poc/internal/repository/models"
 )
 
 type UserRepository interface {
@@ -19,17 +20,17 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	db     *gorm.DB
-	dotSql *dotsql.DotSql
+	db      *gorm.DB
+	queries goyesql.Queries
 }
 
-func NewUserRepository(db *gorm.DB) (UserRepository, error) {
-	dotSql, err := dotsql.LoadFromFile("./internal/repository/queries/user_queries.sql")
+func NewUserRepository(db *gorm.DB, queriesPath string) (UserRepository, error) {
+	queries, err := goyesql.ParseFile(fmt.Sprintf("%s/%s", queriesPath, "user_queries.sql"))
 	if err != nil {
-		return nil, err
+		return userRepository{}, err
 	}
 
-	return userRepository{db: db, dotSql: dotSql}, nil
+	return userRepository{db: db, queries: queries}, nil
 }
 
 func (r userRepository) FindAll() ([]domain.User, error) {
@@ -50,7 +51,7 @@ func (r userRepository) FindAll() ([]domain.User, error) {
 func (r userRepository) FindAllCustom() ([]domain.User, error) {
 	var users []models.User
 
-	if res := r.db.Raw(r.dotSql.QueryMap()["find-all-custom"]).Scan(&users); res.Error != nil {
+	if res := r.db.Raw(r.queries["find-all-custom"]).Scan(&users); res.Error != nil {
 		return nil, errors.New("Find all users failed", res.Error, nil, "repository.FindAllCustom.Find")
 	}
 

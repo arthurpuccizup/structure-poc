@@ -71,7 +71,8 @@ func runMigrations(sqlDb *sql.DB) error {
 }
 
 func loadPersistenceManager(db *gorm.DB) (persistenceManager, error) {
-	userRepo, err := repository.NewUserRepository(db)
+	queriesPath := configuration.Get("QUERIES_PATH")
+	userRepo, err := repository.NewUserRepository(db, queriesPath)
 	if err != nil {
 		return persistenceManager{}, errors.New(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
 	}

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"net/http"
 	userInteractor "poc/internal/use_case/user"
 	"poc/web/api/handlers/v1/representation"

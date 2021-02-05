@@ -1,10 +1,14 @@
 package middlewares
 
-import "net/http"
+import (
+	"context"
+	"github.com/labstack/echo/v4"
+)
 
-func Validator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", "application/json")
-		next.ServeHTTP(w, r)
-	})
+func Validator(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := context.WithValue(c.Request().Context(), "api-request-context", "")
+		c.SetRequest(c.Request().Clone(ctx))
+		return next(c)
+	}
 }

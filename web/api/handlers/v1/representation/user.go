@@ -6,8 +6,8 @@ import (
 )
 
 type UserRequest struct {
-	Name  string `json:"name" validate:"required,notblank"`
-	Email string `json:"email" validate:"required,email"`
+	Name  string `json:"name" validate:"required,notblank" conform:"trim"`
+	Email string `json:"email" validate:"required,email" conform:"email"`
 }
 
 type UserResponse struct {

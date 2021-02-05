@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
-	"github.com/go-playground/validator/v10/non-standard/validators"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"log"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/leebenson/conform"
 	"poc/internal/use_case/user"
 	handlersV1 "poc/web/api/handlers/v1"
 )
@@ -16,13 +14,7 @@ type server struct {
 	echo *echo.Echo
 }
 
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
+type customBinder struct{}
 
 func newServer(pm persistenceManager) server {
 	return server{
@@ -40,18 +32,18 @@ func createEchoInstance() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.RequestID())
 	e.Validator = buildCustomValidator()
+	e.Binder = echo.Binder(customBinder{})
 
 	return e
 }
 
-func buildCustomValidator() *CustomValidator {
-	v := validator.New()
-	err := v.RegisterValidation("notblank", validators.NotBlank)
-	if err != nil {
-		log.Fatal(err)
+func (cb customBinder) Bind(i interface{}, c echo.Context) (err error) {
+	db := new(echo.DefaultBinder)
+	if err = db.Bind(i, c); err != nil {
+		return err
 	}
 
-	return &CustomValidator{validator: v}
+	return conform.Strings(i)
 }
 
 func (s server) registerRoutes() {

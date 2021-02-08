@@ -3,8 +3,8 @@ package user
 import (
 	"github.com/google/uuid"
 	"poc/internal/domain"
-	"poc/internal/observ"
 	"poc/internal/repository"
+	"poc/internal/tracking"
 )
 
 type FindUserById interface {
@@ -24,7 +24,7 @@ func NewFindUserById(r repository.UserRepository) FindUserById {
 func (u findUserById) Execute(id uuid.UUID) (domain.User, error) {
 	user, err := u.userRepository.GetByID(id)
 	if err != nil {
-		return domain.User{}, observ.WithOperation(err, "findUserByID.Execute")
+		return domain.User{}, tracking.WithOperation(err, "findUserByID.Execute")
 	}
 
 	return user, nil

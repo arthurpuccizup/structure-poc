@@ -1,0 +1,3 @@
+p,write,/api/v1/users,(POST)|(PUT)|(DELETE)
+p,(write)|(read),/api/v1/users,GET
+p,(write)|(read),/api/v1/users/{id},GET

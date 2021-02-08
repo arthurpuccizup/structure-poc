@@ -21,5 +21,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Fatalln(newServer(persistenceManager).start("8080"))
+	server, err := newServer(persistenceManager)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Fatalln(server.start("8080"))
 }

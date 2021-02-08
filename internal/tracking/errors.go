@@ -1,4 +1,4 @@
-package observ
+package tracking
 
 import (
 	"fmt"
@@ -37,13 +37,13 @@ func WithMeta(err error, key, value string) error {
 func Unwrap(err error) CustomError {
 	customErr, ok := err.(*CustomError)
 	if !ok {
-		customErr = New("", err, nil).(*CustomError)
+		customErr = NewError("", err, nil).(*CustomError)
 	}
 
 	return *customErr
 }
 
-func New(title string, err error, meta map[string]string, operations ...string) error {
+func NewError(title string, err error, meta map[string]string, operations ...string) error {
 	if meta == nil {
 		meta = map[string]string{
 			"timestamp": strconv.FormatInt(time.Now().Unix(), 10),

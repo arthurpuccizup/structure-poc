@@ -2,8 +2,8 @@ package user
 
 import (
 	"poc/internal/domain"
-	"poc/internal/observ"
 	"poc/internal/repository"
+	"poc/internal/tracking"
 )
 
 type SaveUser interface {
@@ -23,7 +23,7 @@ func NewCreateUser(r repository.UserRepository) SaveUser {
 func (u saveUser) Execute(user domain.User) (domain.User, error) {
 	savedUser, err := u.userRepository.Create(user)
 	if err != nil {
-		return domain.User{}, observ.WithOperation(err, "saveUser.Execute")
+		return domain.User{}, tracking.WithOperation(err, "saveUser.Execute")
 	}
 
 	return savedUser, nil

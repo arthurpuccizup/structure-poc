@@ -19,7 +19,7 @@ as model for the final version, it was inspired by [Uber's style guide](https://
 ## Overall
 
 ### Routes
-All routes should centrilized at one place, this place could be the func routes at http.go, or a routes.go file.
+All routes should be centralized at one place, this place could be the func routes at http.go, or a routes.go file.
 The routes should be grouped with the group function of the framework
 
 ### Handlers

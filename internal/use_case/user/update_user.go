@@ -3,7 +3,7 @@ package user
 import (
 	"github.com/google/uuid"
 	"poc/internal/domain"
-	"poc/internal/errors"
+	"poc/internal/observ"
 	"poc/internal/repository"
 )
 
@@ -24,7 +24,7 @@ func NewUpdateUser(r repository.UserRepository) UpdateUser {
 func (u updateUser) Execute(id uuid.UUID, user domain.User) (domain.User, error) {
 	updatedUser, err := u.userRepository.Update(id, user)
 	if err != nil {
-		return domain.User{}, errors.WithOperation(err, "updateUser.Execute")
+		return domain.User{}, observ.WithOperation(err, "updateUser.Execute")
 	}
 
 	return updatedUser, nil

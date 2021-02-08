@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/google/uuid"
-	"poc/internal/errors"
+	"poc/internal/observ"
 	"poc/internal/repository"
 )
 
@@ -23,7 +23,7 @@ func NewDeleteUser(r repository.UserRepository) DeleteUser {
 func (u deleteUser) Execute(id uuid.UUID) error {
 	err := u.userRepository.Delete(id)
 	if err != nil {
-		return errors.WithOperation(err, "deleteUser.Execute")
+		return observ.WithOperation(err, "deleteUser.Execute")
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"poc/internal/repository/models"
+	"poc/internal/tracking"
 	"poc/internal/use_case/user"
 	mocks "poc/tests/unit/mocks/repository"
 	"testing"
@@ -22,7 +23,7 @@ func (u *UserSuite) SetupSuite() {
 	u.findUserById = user.NewFindUserById(u.userRep)
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func TestSuite(t *testing.T) {
 	suite.Run(t, new(UserSuite))
 }
 
@@ -32,4 +33,11 @@ func (u *UserSuite) TestGetByID() {
 
 	require.NotNil(u.T(), a)
 	require.Nil(u.T(), err)
+}
+
+func (u *UserSuite) TestErrorGetByID() {
+	u.userRep.On("GetByID", mock.Anything).Return(models.User{}, tracking.NewError("error", nil, nil))
+	_, err := u.findUserById.Execute(uuid.New())
+
+	require.Error(u.T(), err)
 }

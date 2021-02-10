@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"poc/internal/domain"
 	"poc/internal/repository"
 	"poc/internal/tracking"
@@ -23,7 +22,7 @@ func NewFindAllUsers(r repository.UserRepository) FindAllUsers {
 }
 
 func (u findAllUsers) Execute(ctx context.Context) ([]domain.User, error) {
-	logger := ctx.Value(tracking.LoggerFlag).(*zap.SugaredLogger)
+	logger := tracking.LoggerFromContext(ctx)
 	logger.Info("Listing all users...")
 	users, err := u.userRepository.FindAll()
 	if err != nil {

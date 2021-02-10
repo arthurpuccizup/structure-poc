@@ -1,6 +1,7 @@
 package tracking
 
 import (
+	"context"
 	"go.uber.org/zap"
 	"poc/internal/configuration"
 )
@@ -23,4 +24,8 @@ func NewLogger() (*zap.Logger, error) {
 	}
 
 	return logger, nil
+}
+
+func LoggerFromContext(ctx context.Context) *zap.SugaredLogger {
+	return ctx.Value(LoggerFlag).(*zap.SugaredLogger)
 }

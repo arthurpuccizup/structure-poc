@@ -38,7 +38,7 @@ func ListUsers(findAllUsers userInteractor.FindAllUsers) echo.HandlerFunc {
 
 func CreateUser(saveUser userInteractor.SaveUser) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		logger := c.Request().Context().Value(tracking.LoggerFlag).(*zap.SugaredLogger)
+		logger := tracking.LoggerFromContext(c.Request().Context())
 		var user representation.UserRequest
 		bindErr := c.Bind(&user)
 		if bindErr != nil {
@@ -64,7 +64,7 @@ func CreateUser(saveUser userInteractor.SaveUser) echo.HandlerFunc {
 
 func FindUserById(findUserById userInteractor.FindUserById) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		logger := c.Request().Context().Value(tracking.LoggerFlag).(*zap.SugaredLogger)
+		logger := tracking.LoggerFromContext(c.Request().Context())
 		uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 		if parseErr != nil {
 			logger.Error(parseErr)
@@ -83,7 +83,7 @@ func FindUserById(findUserById userInteractor.FindUserById) echo.HandlerFunc {
 
 func UpdateUser(updateUser userInteractor.UpdateUser) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		logger := c.Request().Context().Value(tracking.LoggerFlag).(*zap.SugaredLogger)
+		logger := tracking.LoggerFromContext(c.Request().Context())
 		uuid, parseErr := uuidPkg.Parse(c.Param("userId"))
 		if parseErr != nil {
 			logger.Error(parseErr)

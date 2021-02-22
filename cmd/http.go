@@ -3,16 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/casbin/casbin/v2"
+	"github.com/go-playground/locales/en"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/non-standard/validators"
+	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/leebenson/conform"
+	"poc/internal/logging"
 	"poc/internal/use_case/user"
 	"poc/web/api/handlers"
 	handlersV1 "poc/web/api/handlers/v1"
 	"poc/web/api/middlewares"
+	"reflect"
+	"strings"
 )
 
 type server struct {
@@ -24,7 +30,8 @@ type server struct {
 type customBinder struct{}
 
 type CustomValidator struct {
-	validator *validator.Validate
+	validator  *validator.Validate
+	translator *ut.UniversalTranslator
 }
 
 func newServer(pm persistenceManager) (server, error) {
@@ -45,15 +52,17 @@ func (s server) start(port string) error {
 }
 
 func createEchoInstance() *echo.Echo {
-	e := echo.New()
-	e.Use(echoMiddleware.RequestID())
-	e.Use(middlewares.ContextLogger)
-	e.Validator = buildCustomValidator()
-	e.Binder = echo.Binder(customBinder{})
-	p := prometheus.NewPrometheus("echo", nil)
-	p.Use(e)
+	http := echo.New()
+	http.Use(echoMiddleware.RequestID())
+	http.Use(middlewares.ContextLogger)
+	http.Use(middlewares.Logger)
+	http.Validator = buildCustomValidator()
+	http.Binder = echo.Binder(customBinder{})
 
-	return e
+	prom := prometheus.NewPrometheus("echo", nil)
+	prom.Use(http)
+
+	return http
 }
 
 func (cb customBinder) Bind(i interface{}, c echo.Context) (err error) {
@@ -66,7 +75,12 @@ func (cb customBinder) Bind(i interface{}, c echo.Context) (err error) {
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
+	err := cv.validator.Struct(i)
+	if err != nil {
+		return logging.NewValidationError(err, cv.translator)
+	}
+
+	return nil
 }
 
 func buildCustomValidator() *CustomValidator {
@@ -74,8 +88,23 @@ func buildCustomValidator() *CustomValidator {
 	if err := v.RegisterValidation("notblank", validators.NotBlank); err != nil {
 		return nil
 	}
+	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
+		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+		if name == "-" {
+			return ""
+		}
+		return name
+	})
+	defaultLang := en.New()
+	uniTranslator := ut.New(defaultLang, defaultLang)
 
-	return &CustomValidator{validator: v}
+	defaultTrans, _ := uniTranslator.GetTranslator("en")
+	_ = enTranslations.RegisterDefaultTranslations(v, defaultTrans)
+
+	return &CustomValidator{
+		validator:  v,
+		translator: uniTranslator,
+	}
 }
 
 func casbinEnforcer() (*casbin.Enforcer, error) {

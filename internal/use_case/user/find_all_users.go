@@ -1,14 +1,13 @@
 package user
 
 import (
-	"context"
 	"poc/internal/domain"
+	"poc/internal/logging"
 	"poc/internal/repository"
-	"poc/internal/tracking"
 )
 
 type FindAllUsers interface {
-	Execute(ctx context.Context) ([]domain.User, error)
+	Execute() ([]domain.User, error)
 }
 
 type findAllUsers struct {
@@ -21,12 +20,10 @@ func NewFindAllUsers(r repository.UserRepository) FindAllUsers {
 	}
 }
 
-func (u findAllUsers) Execute(ctx context.Context) ([]domain.User, error) {
-	logger := tracking.LoggerFromContext(ctx)
-	logger.Info("Listing all users...")
+func (u findAllUsers) Execute() ([]domain.User, error) {
 	users, err := u.userRepository.FindAll()
 	if err != nil {
-		return make([]domain.User, 0), tracking.WithOperation(err, "findAllUsers.Execute")
+		return make([]domain.User, 0), logging.WithOperation(err, "findAllUsers.Execute")
 	}
 
 	return users, nil

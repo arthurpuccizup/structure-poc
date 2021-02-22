@@ -7,13 +7,13 @@ import (
 
 type UserRequest struct {
 	Name  string `json:"name" validate:"required,notblank" conform:"trim"`
-	Email string `json:"email" validate:"required,email" conform:"email"`
+	Email string `json:"email" validate:"omitempty,email" conform:"email"`
 }
 
 type UserResponse struct {
-	ID    uuid.UUID `json:"id" example:"6a49fe7b-6586-420e-973a-86be82a79fc2" description:"The user identifier" type:"string" format:"uuid"`
-	Name  string    `json:"name" example:"Fulano da Silva" description:"The user name"`
-	Email string    `json:"email" example:"user@email.com" description:"The user email"`
+	ID    uuid.UUID `json:"id"`
+	Name  string    `json:"name"`
+	Email string    `json:"email"`
 }
 
 func (userRequest UserRequest) ToUserDomain() domain.User {

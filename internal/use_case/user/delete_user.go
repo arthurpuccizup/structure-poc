@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/google/uuid"
+	"poc/internal/logging"
 	"poc/internal/repository"
-	"poc/internal/tracking"
 )
 
 type DeleteUser interface {
@@ -23,7 +23,7 @@ func NewDeleteUser(r repository.UserRepository) DeleteUser {
 func (u deleteUser) Execute(id uuid.UUID) error {
 	err := u.userRepository.Delete(id)
 	if err != nil {
-		return tracking.WithOperation(err, "deleteUser.Execute")
+		return logging.WithOperation(err, "deleteUser.Execute")
 	}
 
 	return nil

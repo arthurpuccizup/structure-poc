@@ -9,6 +9,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"poc/internal/configuration"
 	"poc/internal/repository"
 )
@@ -44,9 +45,18 @@ func connectDatabase() (*sql.DB, *gorm.DB, error) {
 		return nil, nil, err
 	}
 
+	var logLevel logger.LogLevel
+	if configuration.IsRunningInProduction() {
+		logLevel = logger.Silent
+	} else {
+		logLevel = logger.Info
+	}
+
 	gormDb, err := gorm.Open(postgres.New(postgres.Config{
 		Conn: db,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
+	})
 	if err != nil {
 		return nil, nil, err
 	}

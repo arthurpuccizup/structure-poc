@@ -5,8 +5,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"poc/internal/logging"
 	"poc/internal/repository/models"
-	"poc/internal/tracking"
 	"poc/internal/use_case/user"
 	mocks "poc/tests/unit/mocks/repository"
 	"testing"
@@ -36,7 +36,7 @@ func (u *UserSuite) TestGetByID() {
 }
 
 func (u *UserSuite) TestErrorGetByID() {
-	u.userRep.On("GetByID", mock.Anything).Return(models.User{}, tracking.NewError("error", nil, nil))
+	u.userRep.On("GetByID", mock.Anything).Return(models.User{}, logging.NewError("error", nil, nil))
 	_, err := u.findUserById.Execute(uuid.New())
 
 	require.Error(u.T(), err)

@@ -63,7 +63,7 @@ func NewValidationError(validationError error, uniTranslator *ut.UniversalTransl
 	meta := make(map[string]string, 0)
 
 	for _, validErr := range errors {
-		meta[validErr.Field()] = validErr.Translate(translator)
+		meta[validErr.Namespace()] = validErr.Translate(translator)
 	}
 
 	return &CustomError{

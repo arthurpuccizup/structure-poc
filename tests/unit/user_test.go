@@ -1,12 +1,13 @@
 package unit
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"poc/internal/domain"
 	"poc/internal/logging"
-	"poc/internal/repository/models"
 	"poc/internal/use_case/user"
 	mocks "poc/tests/unit/mocks/repository"
 	"testing"
@@ -28,7 +29,7 @@ func TestSuite(t *testing.T) {
 }
 
 func (u *UserSuite) TestGetByID() {
-	u.userRep.On("GetByID", mock.Anything).Return(models.User{ID: uuid.New()}, nil)
+	u.userRep.On("GetByID", mock.Anything).Return(domain.User{ID: uuid.New()}, nil)
 	a, err := u.findUserById.Execute(uuid.New())
 
 	require.NotNil(u.T(), a)
@@ -36,7 +37,7 @@ func (u *UserSuite) TestGetByID() {
 }
 
 func (u *UserSuite) TestErrorGetByID() {
-	u.userRep.On("GetByID", mock.Anything).Return(models.User{}, logging.NewError("error", nil, nil))
+	u.userRep.On("GetByID", mock.Anything).Return(domain.User{}, logging.NewError("error", errors.New("some error"), nil))
 	_, err := u.findUserById.Execute(uuid.New())
 
 	require.Error(u.T(), err)
